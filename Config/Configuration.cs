@@ -8,15 +8,15 @@ namespace DevProLauncher.Config
     public class Configuration
     {
         public string ServerName;
-        public string ServerAddress = "85.214.205.124";
-        public string ChatServerAddress = "85.214.205.124";
+        public string ServerAddress = "91.250.87.52";
+        public string ChatServerAddress = "91.250.87.52";
         public string UpdaterAddress = "http://ygopro.de/launcher/checkversion.php";
         public string ServerInfoAddress = "http://ygopro.de/launcher/serverinfo.php";
         public int ServerPort = 6922;
         public string DefaultServer = "";
         
-        public int GamePort = 6911;
-        public int ChatPort = 6666;
+        public int GamePort = 8911;
+        public int ChatPort = 8933;
         public string GameExe = "devpro.dll";
         public string LauncherDir =  "";
         public string DefaultUsername = "";
@@ -42,6 +42,7 @@ namespace DevProLauncher.Config
         public bool NoChainDelay = false;
         public bool EnableCustomSleeves = true;
         public string IgnoreList = "";
+        public string DefaultChannel = "";
 
         //quickhost settings
         public string BanList = "";

@@ -1,4 +1,6 @@
-﻿namespace DevProLauncher.Windows
+﻿using DevProLauncher.Helpers;
+
+namespace DevProLauncher.Windows
 {
     sealed partial class HubGameList_frm
     {

@@ -11,12 +11,12 @@ using System.Text;
 using System.Net.NetworkInformation;
 using DevProLauncher.Network.Data;
 using DevProLauncher.Windows;
+using DevProLauncher.Windows.MessageBoxs;
 
 namespace DevProLauncher.Helpers
 {
     public static class LauncherHelper
     {
-
         private static readonly Dictionary<string, int> Banlists = new Dictionary<string, int>();
 
         public static CardsManager CardManager = new CardsManager();
@@ -29,12 +29,10 @@ namespace DevProLauncher.Helpers
 
                 foreach (NetworkInterface nic in nics)
                 {
-                    if (
-                        (nic.NetworkInterfaceType != NetworkInterfaceType.Loopback && nic.NetworkInterfaceType != NetworkInterfaceType.Tunnel) &&
-                        nic.OperationalStatus == OperationalStatus.Up)
-                    {
+                    if ((nic.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                         nic.NetworkInterfaceType != NetworkInterfaceType.Tunnel) &&
+                         nic.OperationalStatus == OperationalStatus.Up)
                         return true;
-                    }
                 }
             }
             catch (Exception)
@@ -42,6 +40,21 @@ namespace DevProLauncher.Helpers
                 return false;
             }
             return false;
+        }
+
+        private static string m_checkmateusr, m_checkmatepass;
+
+        public static void chkmate_btn_Click(object sender, EventArgs e)
+        {
+            Checkmate_frm form = new Checkmate_frm(string.IsNullOrEmpty(m_checkmateusr) ? string.Empty : m_checkmateusr,
+                string.IsNullOrEmpty(m_checkmatepass) ? "" : m_checkmatepass);
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                m_checkmateusr = form.Username.Text;
+                m_checkmatepass = form.Password.Text;
+                GenerateCheckmateConfig(Program.Checkmate, m_checkmateusr, m_checkmatepass);
+                RunGame("-j");
+            }
         }
 
         public static void SyncCloud(object sender, EventArgs e)
@@ -61,10 +74,9 @@ namespace DevProLauncher.Helpers
             foreach (string nonTrimmerLine in lines)
             {
                 string line = nonTrimmerLine.Trim();
+
                 if (line.StartsWith("!"))
-                {
                     Banlists.Add(line.Substring(1), Banlists.Count);
-                }
             }
         }
 
@@ -76,9 +88,8 @@ namespace DevProLauncher.Helpers
         public static string GetBanListFromInt(int value)
         {
             foreach (string key in GetBanListArray().Where(key => Banlists[key] == value))
-            {
                 return key;
-            }
+
             return "Unknown";
         }
 
@@ -93,7 +104,7 @@ namespace DevProLauncher.Helpers
             {
                 var webrequest = (HttpWebRequest)WebRequest.Create(url);
                 var webresponse = (HttpWebResponse)webrequest.GetResponse();
-                using (var reader = new StreamReader(webresponse.GetResponseStream()))
+                using (StreamReader reader = new StreamReader(webresponse.GetResponseStream()))
                 {
                     return reader.ReadToEnd();
                 }
@@ -107,12 +118,11 @@ namespace DevProLauncher.Helpers
 
         public static string EncodePassword(string password)
         {
-            var salt = Encoding.UTF8.GetBytes("&^%£$Ugdsgs:;");
-            var userpassword = Encoding.UTF8.GetBytes(password);
+            byte[] salt = Encoding.UTF8.GetBytes("&^%£$Ugdsgs:;");
+            byte[] userpassword = Encoding.UTF8.GetBytes(password);
 
-            var hmacMD5 = new HMACMD5(salt);
-            var saltedHash = hmacMD5.ComputeHash(userpassword);
-
+            HMACMD5 hmacMD5 = new HMACMD5(salt);
+            byte[] saltedHash = hmacMD5.ComputeHash(userpassword);
 
             //Convert encoded bytes back to a 'readable' string
             return Convert.ToBase64String(saltedHash);
@@ -124,32 +134,23 @@ namespace DevProLauncher.Helpers
             foreach (char c in s)
             {
                 for (int i = 128; i >= 1; i /= 2)
-                {
                     if ((c & i) > 0)
-                    {
                         output += "1";
-                    }
                     else
-                    {
                         output += "0";
-                    }
-                }
             }
             return output;
         }
 
-      
-
         public static string BinaryToString(string binary)
         {
-                int numOfBytes = binary.Length / 8;
-                var bytes = new byte[numOfBytes];
-                for (int i = 0; i < numOfBytes; ++i)
-                {
-                    bytes[i] = Convert.ToByte(binary.Substring(8 * i, 8), 2);
-                }
+            int numOfBytes = binary.Length / 8;
+            Byte[] bytes = new byte[numOfBytes];
 
-                return Encoding.ASCII.GetString(bytes);
+            for (int i = 0; i < numOfBytes; ++i)
+                bytes[i] = Convert.ToByte(binary.Substring(8*i, 8), 2);
+
+            return Encoding.ASCII.GetString(bytes);
         }
 
         public static string StringToBase64(string text)
@@ -190,20 +191,21 @@ namespace DevProLauncher.Helpers
         {
             try
             {
-                var process = new Process();
-                var startInfos = new ProcessStartInfo(Program.Config.LauncherDir + Program.Config.GameExe, arg);
+                Process process = new Process();
+                ProcessStartInfo startInfos = new ProcessStartInfo(Program.Config.LauncherDir + Program.Config.GameExe, arg);
+
                 process.StartInfo = startInfos;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
                 process.StartInfo.WorkingDirectory = Program.Config.LauncherDir;
+
                 if(arg == "-j")
                     process.Exited += UpdateInfo;
                 if(arg == "-d")
                     process.Exited += RefreshDeckList;
                 if (onExit != null)
-                {
                     process.Exited += onExit;
-                }
+
                 process.EnableRaisingEvents = true;
                 process.Start();
             }
@@ -227,8 +229,8 @@ namespace DevProLauncher.Helpers
 
         public static bool CheckInstance()
         {
-            var cProcess = Process.GetCurrentProcess();
-            var aProcesses = Process.GetProcessesByName(cProcess.ProcessName);
+            Process cProcess = Process.GetCurrentProcess();
+            Process[] aProcesses = Process.GetProcessesByName(cProcess.ProcessName);
             int count = aProcesses.Where(process => process.Id != cProcess.Id).Count(process => Assembly.GetExecutingAssembly().Location == cProcess.MainModule.FileName);
             return (count > 0);
         }
@@ -238,11 +240,11 @@ namespace DevProLauncher.Helpers
             if (server == null)
                 return;
             if ((File.Exists(Program.Config.LauncherDir + "system.CONF")))
-            {
                 File.Delete(Program.Config.LauncherDir + "system.CONF");
-            }
+
             string gameName = roominfo;
-            var writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+            StreamWriter writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+
             writer.WriteLine("#config file");
             writer.WriteLine("#nickname & gamename should be less than 20 characters");
             writer.WriteLine("#Generated using " + roominfo);
@@ -272,10 +274,10 @@ namespace DevProLauncher.Helpers
         public static void GenerateConfig()
         {
             if ((File.Exists(Program.Config.LauncherDir + "system.CONF")))
-            {
                 File.Delete(Program.Config.LauncherDir + "system.CONF");
-            }
-            var writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+
+            StreamWriter writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+
             writer.WriteLine("#config file");
             writer.WriteLine("#nickname & gamename should be less than 20 characters");
             writer.WriteLine("use_d3d = " + Convert.ToInt32(Program.Config.Enabled3D));
@@ -300,10 +302,10 @@ namespace DevProLauncher.Helpers
         public static void GenerateConfig(bool isreplay, string file = "")
         {
             if ((File.Exists(Program.Config.LauncherDir + "system.CONF")))
-            {
                 File.Delete(Program.Config.LauncherDir + "system.CONF");
-            }
-            var writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+
+            StreamWriter writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+
             writer.WriteLine("#config file");
             writer.WriteLine("#nickname & gamename should be less than 20 characters");
             writer.WriteLine("use_d3d = " + Convert.ToInt32(Program.Config.Enabled3D));
@@ -323,6 +325,7 @@ namespace DevProLauncher.Helpers
             writer.WriteLine("auto_chain_order = " + Convert.ToInt32(Program.Config.AutoChain));
             writer.WriteLine("no_delay_for_chain = " + Convert.ToInt32(Program.Config.NoChainDelay));
             writer.WriteLine("enable_sleeve_loading = " + Convert.ToInt32(Program.Config.EnableCustomSleeves));
+
             if (isreplay)
                 writer.WriteLine("lastreplay = " + file);
             else
@@ -330,13 +333,13 @@ namespace DevProLauncher.Helpers
             writer.Close();
         }
 
-        public static void GenerateCheckmateConfig(ServerInfo server,string username,string password)
+        public static void GenerateCheckmateConfig(ServerInfo server, string username, string password)
         {
             if ((File.Exists(Program.Config.LauncherDir + "system.CONF")))
-            {
                 File.Delete(Program.Config.LauncherDir + "system.CONF");
-            }
-            var writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+
+            StreamWriter writer = new StreamWriter(Program.Config.LauncherDir + "system.CONF");
+
             writer.WriteLine("#config file");
             writer.WriteLine("#nickname & gamename should be less than 20 characters");
             writer.WriteLine("use_d3d = " + Convert.ToInt32(Program.Config.Enabled3D));
@@ -383,8 +386,9 @@ namespace DevProLauncher.Helpers
 
         public static string GenerateString()
         {
-            var g = Guid.NewGuid();
-            var guidString = Convert.ToBase64String(g.ToByteArray());
+            Guid g = Guid.NewGuid();
+            string guidString = Convert.ToBase64String(g.ToByteArray());
+
             guidString = guidString.Replace("=", "");
             guidString = guidString.Replace("+", "");
             guidString = guidString.Replace("/", "");
@@ -394,9 +398,7 @@ namespace DevProLauncher.Helpers
         public static string GetUID()
         {
             if (RegEditor.Read("Software\\devpro\\", "UID") != null)
-            {
                 return RegEditor.Read("Software\\devpro\\", "UID");
-            }
 
             RegEditor.CreateDirectory("Software\\devpro\\");
             RegEditor.Write("Software\\devpro\\", "UID", GenerateString());
