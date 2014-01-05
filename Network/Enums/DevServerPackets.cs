@@ -4,6 +4,7 @@
     {
         GameList = 0,
         ChannelList = 1,
+        RandomSpectate = 2,
         Ping = 3,
         Login = 4,
         Register = 5,
@@ -27,6 +28,7 @@
         TournamentCreate = 25,
         Stats = 26,
         TeamStats = 27,
-        TeamCommand = 28
+        TeamCommand = 28,
+        UpdatePassword = 29
     }
 }

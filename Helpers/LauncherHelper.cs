@@ -19,8 +19,6 @@ namespace DevProLauncher.Helpers
     {
         private static readonly Dictionary<string, int> Banlists = new Dictionary<string, int>();
 
-        public static CardsManager CardManager = new CardsManager();
-
         public static bool TestConnection()
         {
             try
@@ -52,16 +50,9 @@ namespace DevProLauncher.Helpers
             {
                 m_checkmateusr = form.Username.Text;
                 m_checkmatepass = form.Password.Text;
-                GenerateCheckmateConfig(Program.Checkmate, m_checkmateusr, m_checkmatepass);
+                GenerateCheckmateConfig(Program.CheckmateServerList[form.ServerSelect.SelectedItem.ToString()], m_checkmateusr, m_checkmatepass);
                 RunGame("-j");
             }
-        }
-
-        public static void SyncCloud(object sender, EventArgs e)
-        {
-            DropBoxSynch_frm dbsfrm = new DropBoxSynch_frm();
-
-            dbsfrm.ShowDialog();
         }
 
         public static void LoadBanlist()

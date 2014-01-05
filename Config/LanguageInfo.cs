@@ -39,6 +39,8 @@ namespace DevProLauncher.Config
         public string RegistMsb4 = "Registering Complete!";
         public string RegistMsb5 = "This username has been taken.";
         public string RegistMsb6 = "Username cannot contain special characters";
+        public string RegistMsb7 = "Email address reqired.";
+        public string RegistMsb8 = "Invalid email address.";
 
         // HubGameList_frm
 
@@ -59,6 +61,7 @@ namespace DevProLauncher.Config
         public string GameNotUpdating = "Status: Not Updating";
         public string GameUpdating1 = "Status: Updating for ";
         public string GameUpdating2 = " seconds.";
+        public string GameSpectate = "Random Spectate";
 
         public string GameNoServers = "No servers are available.";
 

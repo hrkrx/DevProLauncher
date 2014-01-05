@@ -148,7 +148,7 @@ namespace DevProLauncher.Windows
                             savePassCheckBox.Checked);
             Program.ChatServer.SendPacket(DevServerPackets.Login,
             JsonSerializer.SerializeToString(
-            new LoginRequest { Username = usernameInput.Text, Password = (encoded ? passwordInput.Text:LauncherHelper.EncodePassword(passwordInput.Text)), UID = LauncherHelper.GetUID() }));
+            new LoginRequest { Username = usernameInput.Text, Password = (encoded ? passwordInput.Text:LauncherHelper.EncodePassword(passwordInput.Text)), UID = LauncherHelper.GetUID(), Version = Convert.ToInt32(Program.Version)}));
         }
 
         private void LoginResponse(DevClientPackets type, LoginData data)
@@ -227,6 +227,11 @@ namespace DevProLauncher.Windows
                     loginBtn_Click(sender, null);
                 else
                     MessageBox.Show("Not connected to server.");
+        }
+
+        private void CheckmateBtn_Click(object sender, EventArgs e)
+        {
+            LauncherHelper.chkmate_btn_Click(sender, e);
         }
     }
 }

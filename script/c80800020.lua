@@ -19,6 +19,14 @@ function c80800020.initial_effect(c)
 	e2:SetTarget(c80800020.sdtg)
 	e2:SetOperation(c80800020.sdop)
 	c:RegisterEffect(e2)
+	--
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_CONFIRM_DECKTOP)
+	e3:SetRange(LOCATION_DECK)
+	e3:SetLabelObject(e2)
+	e3:SetCondition(c80800020.chk)
+	c:RegisterEffect(e3)
 end
 function c80800020.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
@@ -38,9 +46,9 @@ function c80800020.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c80800020.sdcon(e,tp,eg,ep,ev,re,r,rp)
-	if not re or e:GetHandler():IsReason(REASON_RETURN) then return false end
-	local code=re:GetHandler():GetCode()
-	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) and (code==32362575 or code==79106360 or code==18631392 or code==58577036 or code==43040603 or code==22796548 or code==90951921 or code==80800020 or code==80800015 or code==1015)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_DECK) 
+	and	re==e:GetLabelObject()
 end
 function c80800020.sdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
@@ -49,13 +57,16 @@ function c80800020.sdop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
 	if ct==1 then 
 		Duel.SortDecktop(tp,tp,1)
-		e:SetLabel(1)
 	else
 		local ac=0
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(80800020,2))
 		if ct==2 then ac=Duel.AnnounceNumber(tp,1,2)
 		else ac=Duel.AnnounceNumber(tp,1,2,3) end
 		Duel.SortDecktop(tp,tp,ac)
-		e:SetLabel(ac)
+	end
+end
+function c80800020.chk(e,tp,eg,ep,ev,re,r,rp)
+	if  eg:IsContains(e:GetHandler()) then
+		e:GetLabelObject():SetLabelObject(re)
 	end
 end

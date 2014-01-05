@@ -24,6 +24,14 @@ function c80800015.initial_effect(c)
 	e3:SetTarget(c80800015.sptg)
 	e3:SetOperation(c80800015.spop)
 	c:RegisterEffect(e3)
+	--
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_CONFIRM_DECKTOP)
+	e4:SetRange(LOCATION_DECK)
+	e4:SetLabelObject(e3)
+	e4:SetCondition(c80800015.chk)
+	c:RegisterEffect(e4)
 end
 function c80800015.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
@@ -41,9 +49,9 @@ function c80800015.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c80800015.spcon(e,tp,eg,ep,ev,re,r,rp)
-	if not re or e:GetHandler():IsReason(REASON_RETURN) then return false end
-	local code=re:GetHandler():GetCode()
-	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) and (code==32362575 or code==79106360 or code==18631392 or code==58577036 or code==43040603 or code==22796548 or code==90951921 or code==1020 or code==80800015 or code==80800020)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_DECK) 
+	and	re==e:GetLabelObject()
 end
 function c80800015.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,80800015)==0 end
@@ -54,7 +62,8 @@ function c80800015.filter(c,e,tp)
 end
 function c80800015.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c80800015.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c80800015.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c80800015.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) 
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c80800015.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
@@ -63,5 +72,10 @@ function c80800015.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+function c80800015.chk(e,tp,eg,ep,ev,re,r,rp)
+	if  eg:IsContains(e:GetHandler()) then
+		e:GetLabelObject():SetLabelObject(re)
 	end
 end

@@ -38,6 +38,7 @@ namespace DevProLauncher.Network.Data
                 case MessageType.Server:
                     return Program.Config.ServerMsgColor.ToColor();
                 case MessageType.System:
+                case MessageType.MOTD:
                     return Program.Config.SystemColor.ToColor();
                 case MessageType.Join:
                     return Program.Config.JoinColor.ToColor();
@@ -60,9 +61,9 @@ namespace DevProLauncher.Network.Data
                 case 2:
                     return Program.Config.Level2Color.ToColor();
                 case 3:
-                    return Program.Config.Level2Color.ToColor();
+                    return Program.Config.Level3Color.ToColor();
                 case 4:
-                    return Program.Config.Level1Color.ToColor();
+                    return Program.Config.Level4Color.ToColor();
                 case 99:
                     return Program.Config.Level99Color.ToColor();
             }
@@ -81,9 +82,9 @@ namespace DevProLauncher.Network.Data
                 case 2:
                     return new SolidBrush(Program.Config.Level2Color.ToColor());
                 case 3:
-                    return new SolidBrush(Program.Config.Level2Color.ToColor());
+                    return new SolidBrush(Program.Config.Level3Color.ToColor());
                 case 4:
-                    return new SolidBrush(Program.Config.Level1Color.ToColor());
+                    return new SolidBrush(Program.Config.Level4Color.ToColor());
                 case 99:
                     return new SolidBrush(Program.Config.Level99Color.ToColor());
             }

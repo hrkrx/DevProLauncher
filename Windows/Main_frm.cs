@@ -5,20 +5,20 @@ using DevProLauncher.Network.Enums;
 using DevProLauncher.Helpers;
 using System.Diagnostics;
 using DevProLauncher.Windows.MessageBoxs;
-using DropNet;
-using DevProLauncher.Controller;
 
 namespace DevProLauncher.Windows
 {
     public partial class MainFrm : Form
     {
-        public readonly HubGameList_frm GameWindow;
-        readonly LoginFrm m_loginWindow;
-        readonly ChatFrm m_chatWindow;
-        readonly SupportFrm m_devpointWindow;
-        readonly FileManagerFrm m_filemanagerWindow;
-        readonly CustomizeFrm m_customizerWindow;
-        readonly Browser_frm m_wcsBrowser;
+        public HubGameList_frm GameWindow;
+        LoginFrm m_loginWindow;
+        ChatFrm m_chatWindow;
+        SupportFrm m_devpointWindow;
+        FileManagerFrm m_filemanagerWindow;
+        CustomizeFrm m_customizerWindow;
+        Browser_frm m_wcsBrowser;
+        Browser_frm m_faqBrowser;
+
 
         public MainFrm()
         {
@@ -41,10 +41,9 @@ namespace DevProLauncher.Windows
             m_devpointWindow = new SupportFrm();
             m_filemanagerWindow = new FileManagerFrm();
             m_customizerWindow = new CustomizeFrm();
-            LauncherHelper.CardManager.Init();
+            m_faqBrowser = new Browser_frm();
+            m_faqBrowser.FormBorderStyle = FormBorderStyle.None;
 
-            Program.ChatServer.Banned += ServerMessage;
-            Program.ChatServer.Kicked += ServerMessage;
             Program.ChatServer.ServerMessage += ServerMessage;
 
             mainTabs.SelectedIndexChanged += TabChange;
@@ -113,7 +112,7 @@ namespace DevProLauncher.Windows
             chatTab.Controls.Add(m_chatWindow);
             mainTabs.TabPages.Add(chatTab);
 
-            var wcsTab = new TabPage("DevPro WCS");
+            var wcsTab = new TabPage("Downloads");
             wcsTab.Controls.Add(m_wcsBrowser);
             mainTabs.TabPages.Add(wcsTab);
 
@@ -128,6 +127,10 @@ namespace DevProLauncher.Windows
             var devpointTab = new TabPage("Support DevPro");
             devpointTab.Controls.Add(m_devpointWindow);
             mainTabs.TabPages.Add(devpointTab);
+
+            var faqTab = new TabPage("FAQ");
+            faqTab.Controls.Add(m_faqBrowser);
+            mainTabs.TabPages.Add(faqTab);
                 
             ConnectionCheck.Enabled = true;
             ConnectionCheck.Tick += CheckConnection;
@@ -162,7 +165,7 @@ namespace DevProLauncher.Windows
                 var connectionCheck = (Timer)sender;
                 Hide();
                 connectionCheck.Enabled = false;
-                if (MessageBox.Show("Disconnected from server.", "Server", MessageBoxButtons.OK) == DialogResult.OK)
+                if (MessageBox.Show(!string.IsNullOrEmpty(Program.ChatServer.ServerKickBanMessage) ? Program.ChatServer.ServerKickBanMessage: "Disconnected from server.", "Server", MessageBoxButtons.OK) == DialogResult.OK)
                 {
                     var process = new Process();
                     var startInfos = new ProcessStartInfo(Application.ExecutablePath, "-r");
@@ -212,16 +215,13 @@ namespace DevProLauncher.Windows
 
         }
 
-        private void DBSyncBtn_Click(object sender, EventArgs e)
-        {
-            LauncherHelper.SyncCloud(sender,e);
-        }
-
         private void TabChange(object sender, EventArgs e)
         {
-            if(mainTabs.SelectedIndex == 2)
-                m_wcsBrowser.Navigate("http://wcs.devpro.org/launcher.php", false);
-            else if(mainTabs.SelectedIndex == 1)
+            if (mainTabs.SelectedIndex == 2)
+                m_wcsBrowser.Navigate("http://ygopro.de/launcher/events.php", false);
+            else if (mainTabs.SelectedIndex == mainTabs.TabPages.Count - 1)
+                m_faqBrowser.Navigate("http://ygopro.de/en/faq/", false);
+            else if (mainTabs.SelectedIndex == 1)
                 m_chatWindow.LoadDefualtChannel();
         }
 
